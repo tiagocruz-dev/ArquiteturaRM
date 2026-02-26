@@ -1,0 +1,374 @@
+# Arquitetura Corporativa – Linha RM
+
+## 1. Introdução
+
+O ecossistema da **Linha RM** é baseado em uma arquitetura **multicamadas (N-Tier)**, permitindo alta escalabilidade, melhor distribuição de carga e isolamento de processamento.
+
+Historicamente, o RM era implantado em ambientes de **1 ou 2 camadas**, onde um único servidor concentrava:
+
+- Banco de dados
+- Servidor de aplicação
+- Clientes
+
+Com a evolução da plataforma, o RM passou a suportar **arquiteturas distribuídas**, separando:
+
+- Banco de dados
+- Servidores de aplicação
+- Servidores de processamento (Jobs)
+- Clientes Win
+- Clientes Web
+
+Hoje a arquitetura recomendada é **N Camadas**, permitindo escalabilidade horizontal e alta disponibilidade.
+
+---
+
+# 2. Visão Arquitetural
+
+## Arquitetura N Camadas
+         +----------------------+
+         |     Client Win       |
+         |      RM.exe          |
+         +----------+-----------+
+                    |
+                    |
+         +----------v-----------+
+         |    Smart Client      |
+         |      WCF TCP/HTTP    |
+         +----------+-----------+
+                    |
+                    |
+            +-------v-------+
+            |      TGM      |
+            | Load Balancer |
+            +-------+-------+
+                    |
+     +--------------+--------------+
+     |                             |
++--------v---------+ +--------v---------+
+| Application Host | | Application Host |
+| RM.Host.exe | | RM.Host.exe |
++--------+---------+ +--------+---------+
+| |
++--------------+--------------+
+|
++-------v-------+
+| Job Servers |
+| Background |
++-------+-------+
+|
++-------v-------+
+| Banco de Dados|
+| SQL/Oracle |
++---------------+
+
+
+---
+
+# 3. Componentes da Arquitetura
+
+## 3.1 Banco de Dados
+
+O banco de dados é responsável pelo armazenamento e gerenciamento das informações do sistema.
+
+### Bancos Suportados
+
+| Banco | Versões |
+|------|---------|
+| SQL Server | 2016 até 2022 |
+| Oracle | 18c e 19c |
+
+### Responsabilidades
+
+- Armazenamento de dados
+- Integridade transacional
+- Execução de consultas
+- Controle de concorrência
+
+---
+
+## 3.2 Servidor de Aplicação (Application Server)
+
+O **Servidor de Aplicação (RM.Host.exe)** é responsável pelo processamento das regras de negócio e atendimento das requisições dos clientes.
+
+### Responsabilidades
+
+- Processamento de telas
+- Regras de negócio
+- Comunicação com banco
+- Execução de serviços
+
+### Execução Paralela
+
+O Host permite configurar múltiplos serviços simultâneos.
+
+Benefícios:
+
+- Processamento paralelo
+- Redução de tempo de resposta
+- Melhor uso de CPU
+
+### Dimensionamento
+
+A quantidade ideal depende de:
+
+- Número de usuários simultâneos
+- Capacidade de CPU
+- Memória disponível
+- Tipo de operações realizadas
+
+---
+
+## 3.3 Balanceamento de Carga
+
+### Balanceamento Nativo RM
+
+O RM permite configurar múltiplos servidores de aplicação.
+
+Benefícios:
+
+- Distribuição de carga
+- Melhor performance
+- Redundância
+
+---
+
+## 3.4 TOTVS Gateway Manager (TGM)
+
+O **TOTVS Gateway Manager (TGM)** atua como um **ponto único de acesso** para os servidores de aplicação.
+
+### Funções
+
+- Balanceamento de carga
+- Monitoramento de hosts
+- Redirecionamento de requisições
+- Alta disponibilidade
+
+### Fluxo
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
+
+### Benefícios
+
+- Alta disponibilidade
+- Failover automático
+- Escalabilidade horizontal
+
+---
+
+# 4. Job Server
+
+## 4.1 Visão Geral
+
+O **Job Server** é responsável pela execução de processos em background.
+
+Esses processos incluem:
+
+- Relatórios
+- Integrações
+- Rotinas batch
+- Processos agendados
+
+O Job Server executa como um serviço do Host, porém é habilitado apenas nos servidores dedicados a Jobs.
+
+---
+
+## 4.2 Funcionamento
+
+Os processos submetidos são registrados em tabelas do banco.
+
+### Tabelas
+
+| Tabela | Função |
+|-------|--------|
+| GJOBX | Registro dos processos |
+| GJOBXEXECUCAO | Controle da fila |
+
+Fluxo:
